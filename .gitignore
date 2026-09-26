@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.h5
+dataset/
+.venv/
+node_modules/
+postgres_data/
+qdrant_data/

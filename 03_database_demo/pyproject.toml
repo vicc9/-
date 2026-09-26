@@ -1,0 +1,22 @@
+[project]
+name = "03-database-demo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "vicc9", email = "geegle2@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "ipykernel>=7.3.0",
+    "psycopg2>=2.9.13",
+    "qdrant-client>=1.19.1",
+    "sqlmodel>=0.0.42",
+]
+
+[project.scripts]
+03-database-demo = "03_database_demo:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"

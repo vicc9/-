@@ -1,0 +1,25 @@
+[project]
+name = "05-backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "vicc9", email = "geegle2@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi[standard]>=0.141.1",
+    "psycopg2>=2.9.13",
+    "psycopg2-binary>=2.9.13",
+    "pydantic-settings>=2.15.0",
+    "qdrant-client>=1.19.1",
+    "sqlmodel>=0.0.47",
+    "uvicorn>=0.53.0",
+]
+
+[project.scripts]
+05-backend = "05_backend:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"

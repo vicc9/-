@@ -1,0 +1,28 @@
+[project]
+name = "04-data-collection"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "vicc9", email = "geegle2@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "ipykernel>=7.3.0",
+    "pandas>=2.3.3",
+    "psycopg2>=2.9.13",
+    "psycopg2-binary>=2.9.13",
+    "pyarrow>=25.0.1",
+    "qdrant-client>=1.19.1",
+    "scikit-learn>=1.7.2",
+    "scipy>=1.15.3",
+    "sqlmodel>=0.0.46",
+    "tables>=3.10.1",
+]
+
+[project.scripts]
+04-data-collection = "04_data_collection:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
