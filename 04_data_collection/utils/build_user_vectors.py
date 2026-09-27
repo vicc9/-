@@ -40,6 +40,18 @@ before_users = listening_history_subset["user_id"].nunique()
 user_play_counts = listening_history_subset.groupby("user_id").size()
 valid_users = user_play_counts[user_play_counts >= MIN_PLAYS_PER_USER].index
 
+TEST_USER_ID = "fe46229c04158fad4199c5c2b353e4355c82c419"
+
+test_play_count = int(
+    user_play_counts.get(TEST_USER_ID, 0)
+)
+
+print("========================================")
+print("測試 User ID:", TEST_USER_ID)
+print("播放紀錄數:", test_play_count)
+print("是否通過向量建立條件:", TEST_USER_ID in valid_users)
+print("========================================")
+
 listening_history_subset = listening_history_subset[
     listening_history_subset["user_id"].isin(valid_users)
 ].reset_index(drop=True)
