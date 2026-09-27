@@ -3,7 +3,14 @@ import pandas as pd
 from scipy.sparse import csr_matrix
 from sklearn.decomposition import TruncatedSVD
 from qdrant_client import QdrantClient
-from qdrant_client.models import VectorParams, Distance, PointStruct
+from qdrant_client.models import (
+    VectorParams,
+    Distance,
+    PointStruct,
+    PayloadSchemaType,
+)
+
+from app.core.config import settings
 
 # -----------------------------------------------------------------------------
 # 0. 讀取先前步驟篩選好的 CSV 資料
@@ -105,19 +112,52 @@ print(f"降維後矩陣形狀: {reduced_vectors.shape}")
 # -----------------------------------------------------------------------------
 # 4. 連線至 Qdrant 並建立 Collection
 # -----------------------------------------------------------------------------
-client = QdrantClient("localhost", port=6333)
-collection_name = "user_song_vectors"
-
-# 【修正】每次重新產生向量時先刪除舊 collection 再重建，避免新舊向量維度
-# 不一致（例如 n_components 動態調整後）導致寫入失敗或資料混雜。
-if client.collection_exists(collection_name):
-    client.delete_collection(collection_name)
-
-client.create_collection(
-    collection_name=collection_name,
-    vectors_config=VectorParams(size=n_components, distance=Distance.COSINE),
+client = QdrantClient(
+    url=settings.VECTOR_DATABASE_URL,
+    api_key=settings.QDRANT_API_KEY,
 )
 
+collection_name = settings.COLLECTION_NAME_USER_HISTORY
+
+print(f"連線 Qdrant: {settings.VECTOR_DATABASE_URL}")
+print(f"Collection: {collection_name}")
+
+
+# 如果 Collection 已存在，刪除後重新建立
+if client.collection_exists(collection_name):
+    print(
+        f"⚠️ Collection 已存在，將重新建立: "
+        f"{collection_name}"
+    )
+
+    client.delete_collection(collection_name)
+
+
+# 建立 Collection
+client.create_collection(
+    collection_name=collection_name,
+    vectors_config=VectorParams(
+        size=n_components,
+        distance=Distance.COSINE,
+    ),
+)
+
+print(
+    f"✅ Collection 建立完成: {collection_name}"
+)
+
+
+# 建立 original_id Payload Index
+client.create_payload_index(
+    collection_name=collection_name,
+    field_name="original_id",
+    field_schema=PayloadSchemaType.KEYWORD,
+)
+
+print(
+    "✅ Payload Index 建立完成: "
+    f"{collection_name}.original_id"
+)
 
 # -----------------------------------------------------------------------------
 # 5. 批量插入向量數據至 Qdrant
