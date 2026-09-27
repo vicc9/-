@@ -1,4 +1,5 @@
 from functools import lru_cache
+from urllib.parse import quote_plus
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -24,8 +25,9 @@ class Settings(BaseSettings):
 
     @property
     def DATABASE_URL(self) -> str:
+        encoded_password = quote_plus(self.DATABASE_PASSWORD)
         return (
-            f"postgresql://{self.DATABASE_USERNAME}:{self.DATABASE_PASSWORD}@"
+            f"postgresql://{self.DATABASE_USERNAME}:{encoded_password}@"
             f"{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}?sslmode=require"
         )
 
