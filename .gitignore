@@ -6,3 +6,4 @@ dataset/
 node_modules/
 postgres_data/
 qdrant_data/
+*.dump 

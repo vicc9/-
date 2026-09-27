@@ -8,6 +8,7 @@ class VectorStore:
         # 初始化 Qdrant 客戶端，連接到指定 URL
         self.client = AsyncQdrantClient(
             url=settings.VECTOR_DATABASE_URL,
+            api_key=settings.QDRANT_API_KEY,
         )
 
     async def close(self):
