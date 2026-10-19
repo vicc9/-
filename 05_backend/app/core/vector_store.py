@@ -7,23 +7,57 @@ class VectorStore:
     """Qdrant 向量資料庫連接管理類別"""
 
     def __init__(self):
+
+        print("========================================")
+        print("正在建立 Qdrant Client")
+        print("QDRANT URL:", settings.VECTOR_DATABASE_URL)
+        print(
+            "QDRANT API KEY:",
+            "SET" if settings.QDRANT_API_KEY else "NOT SET"
+        )
+        print(
+            "COLLECTION:",
+            settings.COLLECTION_NAME_USER_HISTORY
+        )
+        print("========================================")
+
         self.client = AsyncQdrantClient(
             url=settings.VECTOR_DATABASE_URL,
             api_key=settings.QDRANT_API_KEY,
         )
 
     async def ensure_user_history_index(self):
-        """
-        確保 user_song_vectors 的 original_id
-        存在 KEYWORD Payload Index。
-        """
 
         collection_name = settings.COLLECTION_NAME_USER_HISTORY
 
-        # 確認 Collection 是否存在
-        exists = await self.client.collection_exists(
-            collection_name=collection_name
-        )
+        print("========================================")
+        print("正在檢查 Qdrant Collection")
+        print("Collection:", collection_name)
+        print("========================================")
+
+        try:
+
+            exists = await self.client.collection_exists(
+                collection_name=collection_name
+            )
+
+            print("✅ Qdrant API 連線成功")
+            print("Collection exists:", exists)
+
+        except Exception as e:
+
+            print("========================================")
+            print("❌ Qdrant 連線失敗")
+            print("Exception Type:", type(e).__name__)
+            print("Exception:", repr(e))
+            print("QDRANT URL:", settings.VECTOR_DATABASE_URL)
+            print(
+                "QDRANT API KEY:",
+                "SET" if settings.QDRANT_API_KEY else "NOT SET"
+            )
+            print("========================================")
+
+            raise
 
         if not exists:
             raise RuntimeError(
@@ -34,20 +68,32 @@ class VectorStore:
             f"✅ Qdrant Collection 已存在: {collection_name}"
         )
 
-        # 建立 original_id KEYWORD index
-        await self.client.create_payload_index(
-            collection_name=collection_name,
-            field_name="original_id",
-            field_schema=models.PayloadSchemaType.KEYWORD,
-        )
+        try:
 
-        print(
-            "✅ Qdrant Payload Index 已確認: "
-            f"{collection_name}.original_id (KEYWORD)"
-        )
+            await self.client.create_payload_index(
+                collection_name=collection_name,
+                field_name="original_id",
+                field_schema=models.PayloadSchemaType.KEYWORD,
+            )
+
+            print(
+                "✅ Qdrant Payload Index 已確認: "
+                f"{collection_name}.original_id (KEYWORD)"
+            )
+
+        except Exception as e:
+
+            print("❌ Payload Index 建立失敗")
+            print("Exception Type:", type(e).__name__)
+            print("Exception:", repr(e))
+            raise
 
     async def close(self):
-        """關閉 Qdrant 非同步連線。"""
 
         if self.client:
+
+            print("正在關閉 Qdrant 連線...")
+
             await self.client.close()
+
+            print("✅ Qdrant 連線已關閉")
